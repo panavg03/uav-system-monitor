@@ -460,3 +460,63 @@ export const mockMaintenanceAdvisories = [
     recommendation: "Inspect at next scheduled maintenance",
   },
 ]
+
+export interface MissionReport {
+  id: string
+  engineId: string
+  date: string
+  durationMinutes: number
+  healthDelta: number
+  summary: string
+}
+
+export const mockReports: MissionReport[] = [
+  {
+    id: "MSN-2041",
+    engineId: "EX-104",
+    date: "2026-09-02T13:40:00Z",
+    durationMinutes: 208,
+    healthDelta: 2.4,
+    summary: "Stable operation with minor EGT drift during final climb phase.",
+  },
+  {
+    id: "MSN-2077",
+    engineId: "EX-107",
+    date: "2026-09-01T10:20:00Z",
+    durationMinutes: 176,
+    healthDelta: -3.8,
+    summary: "Oil temperature rose above nominal during low-altitude corridor run.",
+  },
+  {
+    id: "MSN-2112",
+    engineId: "EX-112",
+    date: "2026-08-31T18:15:00Z",
+    durationMinutes: 142,
+    healthDelta: -9.1,
+    summary: "Critical injector issue detected after sustained high-load maneuvering.",
+  },
+  {
+    id: "MSN-2145",
+    engineId: "EX-118",
+    date: "2026-08-30T07:05:00Z",
+    durationMinutes: 195,
+    healthDelta: 1.9,
+    summary: "Sensor sweep completed, no intervention required across main subsystems.",
+  },
+  {
+    id: "MSN-2182",
+    engineId: "EX-121",
+    date: "2026-08-29T05:55:00Z",
+    durationMinutes: 164,
+    healthDelta: -4.2,
+    summary: "Vibration profile exceeded advisory threshold in the final 40 minutes.",
+  },
+  {
+    id: "MSN-2206",
+    engineId: "EX-129",
+    date: "2026-08-28T12:00:00Z",
+    durationMinutes: 221,
+    healthDelta: 3.5,
+    summary: "Airframe and engine telemetry remained within healthy operational band.",
+  },
+]

@@ -5,7 +5,9 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
+  --color-primary: #0A0B0D;
   --color-background: #0A0B0D;
+  --color-auth: #050505;
   --color-surface: #111318;
   --color-surface-raised: #181B21;
   --color-border-hairline: #242832;
@@ -29,7 +31,16 @@
     --foreground: var(--color-text-primary);
   }
 
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-primary);
+  }
+
   body {
+    min-height: 100vh;
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
