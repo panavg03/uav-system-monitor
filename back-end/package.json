@@ -1,0 +1,13 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "��I\u0000n\u0000i\u0000t\u0000i\u0000a\u0000l\u0000i\u0000z\u0000i\u0000n\u0000g\u0000 \u0000b\u0000a\u0000c\u0000k\u0000-\u0000e\u0000n\u0000d\u0000 \u0000i\u0000n\u0000 \u0000r\u0000e\u0000p\u0000o\u0000s\u0000i\u0000t\u0000o\u0000r\u0000y\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
