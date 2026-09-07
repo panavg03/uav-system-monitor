@@ -52,13 +52,7 @@ export async function fetchEngineHealth(req, res) {
   try {
     const health = await getEngineHealth(req.params.id);
 
-    res.json({
-      engine_id: health.engine_id,
-      health_score: health.health_score,
-      risk_level: health.risk_level,
-      total_flight_hours: health.total_flight_hours,
-      last_flight: health.last_flight
-    });
+    res.json(health);
   } catch (error) {
     console.error("Error fetching engine health:", error);
 
