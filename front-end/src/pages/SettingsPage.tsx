@@ -1,19 +1,8 @@
-import React, { useState } from "react";
-
-const initialThresholds = {
-  nominal: 90,
-  advisory: 72,
-  critical: 45,
-};
-
-const users = [
-  { name: "LT. M. Ortiz", role: "Ops Lead", status: "Online" },
-  { name: "Sgt. R. Patel", role: "Maintenance", status: "Standby" },
-  { name: "A1C. D. Kim", role: "Telemetry", status: "Online" },
-];
+import React from "react";
+import { DEFAULT_ALERT_THRESHOLDS, setAlertThresholds, useAlertThresholds } from "../lib/alertThresholds";
 
 export default function SettingsPage() {
-  const [thresholds, setThresholds] = useState(initialThresholds);
+  const thresholds = useAlertThresholds();
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -59,50 +48,51 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-5">
-              {Object.entries(thresholds).map(([key, value]) => (
+              {(Object.keys(thresholds) as Array<keyof typeof thresholds>).map((key) => {
+                const value = thresholds[key];
+                const labels = { nominal: "Nominal ceiling", advisory: "Advisory threshold", critical: "Critical threshold" };
+                return (
                 <div key={key} className="space-y-2">
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-text-secondary">
-                    <span>{key}</span>
+                    <span>{labels[key]}</span>
                     <span className="text-text-primary">{value}</span>
                   </div>
                   <input
                     type="range"
-                    min={0}
-                    max={100}
+                    min={key === "nominal" ? 0 : key === "advisory" ? thresholds.nominal + 1 : thresholds.advisory}
+                    max={key === "nominal" ? thresholds.advisory - 1 : key === "advisory" ? thresholds.critical : 100}
                     value={value}
                     onChange={(event) =>
-                      setThresholds((current) => ({
-                        ...current,
-                        [key]: Number(event.target.value),
-                      }))
+                      setAlertThresholds({ [key]: Number(event.target.value) })
                     }
                     className="h-1 w-full accent-accent-green"
                   />
                 </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
           <section className="border border-border-hairline bg-surface p-5 xl:col-span-2">
-            <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-text-secondary">
-              User Access
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-3">
-              {users.map((user) => (
-                <div key={user.name} className="border border-border-hairline bg-surface-raised p-4">
-                  <div className="font-mono text-xs uppercase tracking-[0.18em] text-text-primary">
-                    {user.name}
-                  </div>
-                  <div className="mt-2 text-sm text-text-secondary">{user.role}</div>
-                  <div className="mt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-accent-green">
-                    <span className="h-2 w-2 rounded-full bg-accent-green" />
-                    {user.status}
-                  </div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-text-secondary">
+                  Threshold Logic
                 </div>
-              ))}
+                <p className="mt-2 max-w-2xl text-xs leading-5 text-text-muted">
+                  Changes apply immediately across the dashboard and persist in this browser. Fault probability below the nominal threshold is nominal; values at or above the critical threshold are critical; the advisory threshold is retained as the operator-defined warning level.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAlertThresholds(DEFAULT_ALERT_THRESHOLDS)}
+                className="border border-border-hairline px-3 py-2 font-mono text-[9px] uppercase tracking-[0.18em] text-text-secondary hover:border-accent-green hover:text-accent-green"
+              >
+                Reset Defaults
+              </button>
             </div>
           </section>
+
         </div>
       </div>
     </div>

@@ -21,26 +21,26 @@ export function TerminalInput({
 
   return (
     <label className={cn("flex flex-col gap-2", containerClassName)}>
-      <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-secondary">
+      <span className="font-mono text-[10px] uppercase tracking-wider text-muted">
         {label}
       </span>
 
       <div
         className={cn(
-          "flex items-center gap-3 border border-border-hairline bg-surface-raised/80 px-3 py-3 transition-colors focus-within:border-accent-green focus-within:shadow-[0_0_0_1px_rgba(57,255,136,0.12)]",
+          "flex items-center gap-3 border border-border bg-surface px-3 py-3 transition-colors focus-within:border-primary",
           className,
         )}
       >
         <input
           {...props}
           type={inputType}
-          className="w-full bg-transparent font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+          className="w-full bg-transparent font-mono text-sm text-text placeholder:text-muted focus:outline-none"
         />
 
         {type === "password" && (
           <button
             type="button"
-            className="flex h-6 w-6 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
+            className="flex h-6 w-6 items-center justify-center text-muted transition-colors hover:text-text"
             aria-label={showPassword ? "Hide password" : "Show password"}
             onClick={() => setShowPassword((current) => !current)}
           >
@@ -50,7 +50,7 @@ export function TerminalInput({
       </div>
 
       {hint && (
-        <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted">
+        <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
           {hint}
         </span>
       )}

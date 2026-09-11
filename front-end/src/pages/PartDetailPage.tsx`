@@ -1,0 +1,92 @@
+import React from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft, Activity } from "lucide-react";
+import { mockEngines, telemetryByEngineId } from "../lib/mockData";
+
+export default function PartDetailPage() {
+  const { engineId, sensorId } = useParams();
+  const navigate = useNavigate();
+
+  const engine = mockEngines.find((item) => item.id === engineId);
+  const telemetry = telemetryByEngineId[engineId ?? ""] ?? {};
+  const sensorData = telemetry[sensorId ?? ""];
+
+  if (!engine) {
+    return (
+      <div className="flex h-full items-center justify-center bg-background p-6 text-center">
+        <div className="max-w-md border border-border bg-surface p-8 shadow-sm">
+          <div className="font-mono text-[10px] uppercase tracking-wider text-muted">Engine Not Found</div>
+          <h2 className="mt-3 font-mono text-xl uppercase tracking-wider text-text">
+            {engineId ?? "Unknown Engine"}
+          </h2>
+          <button
+            type="button"
+            onClick={() => navigate(`/engine/${engineId}`)}
+            className="mt-6 border border-border bg-surface-raised px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-text hover:border-primary hover:text-primary transition-colors"
+          >
+            Return to Engine
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col bg-background">
+      <div className="border-b border-border bg-surface p-4 sm:p-6">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => navigate(`/engine/${engineId}`)}
+            className="flex h-10 w-10 items-center justify-center border border-border bg-surface-raised text-muted transition-colors hover:text-text"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-wider text-muted">
+              {engineId} // Telemetry Detail
+            </div>
+            <h1 className="mt-2 font-mono text-xl font-bold uppercase tracking-wider text-text">
+              {sensorId ? sensorId.toUpperCase() : "General Telemetry"}
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto p-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className="border border-border bg-surface p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center border border-border bg-surface-raised text-primary">
+                <Activity size={16} />
+              </div>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                  Current Value
+                </div>
+                <div className="mt-1 font-mono text-3xl font-bold text-text">
+                  {sensorData?.at(-1)?.value ?? "N/A"}
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 p-4 border border-border bg-surface-raised">
+              <div className="font-mono text-[10px] uppercase tracking-wider text-muted mb-2">Signal Stability</div>
+              <div className="text-sm text-text">The signal for {sensorId} is within operational limits. No anomalies detected in the last 24-hour window.</div>
+            </div>
+          </section>
+
+          <aside className="border border-border bg-surface p-5 shadow-sm">
+            <div className="font-mono text-[10px] uppercase tracking-wider text-muted">
+              Diagnostic Context
+            </div>
+            <p className="mt-4 text-sm leading-6 text-muted">
+              This sensor provides critical input to the fault probability model.
+              Variations in {sensorId} are correlated with {engine.modelOutput.faultClass === "NONE" ? "nominal operation" : engine.modelOutput.faultClass}.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -37,34 +37,38 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-auth px-4 py-10 text-text-primary">
-      <div className="relative w-full max-w-xl overflow-hidden border border-accent-green/60 bg-surface/90 shadow-[0_0_28px_rgba(57,255,136,0.15)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(57,255,136,0.12),_transparent_60%)]" />
-        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(57,255,136,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(57,255,136,0.05)_1px,transparent_1px)] [background-size:18px_18px]" />
-
-        <div className="relative p-6 sm:p-8 lg:p-10">
-          <div className="mb-6 space-y-2 border-b border-border-hairline pb-5">
-            {bootLines.slice(0, bootIndex + 1).map((line, index) => (
-              <div
-                key={`${line}-${index}`}
-                className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent-green/80"
-              >
-                {line}
-              </div>
-            ))}
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-text">
+      <div className="relative w-full max-w-md overflow-hidden border border-border bg-sidebar shadow-xl">
+        <div className="relative p-8 lg:p-12">
+          <div className="mb-8 text-center">
+            <div className="font-mono text-[10px] uppercase tracking-wider text-muted mb-2">
+              UAV_DT_SYS
+            </div>
+            <h1 className="text-xl font-bold text-surface uppercase tracking-wider mb-1">
+              AVIATION OPERATIONS SYSTEM
+            </h1>
+            <div className="text-xs font-mono text-muted uppercase tracking-widest">
+              SECURE ACCESS
+            </div>
+            <div className="mt-4 py-1 px-3 bg-status-critical/20 border border-status-critical/30 text-status-critical text-[10px] font-mono uppercase tracking-widest inline-block">
+              Authorized Personnel Only
+            </div>
           </div>
 
-          <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center border border-accent-green bg-accent-green/10 text-accent-green">
-              <ShieldCheck size={18} />
+          <div className="mb-8 p-4 bg-surface/5 border border-border/20 rounded">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck size={16} className="text-primary" />
+              <span className="text-xs font-mono text-surface uppercase tracking-widest">Access Terminal</span>
             </div>
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-text-muted">
-                UAV_DT_SYS
-              </div>
-              <h1 className="mt-1 font-mono text-xl font-bold uppercase tracking-[0.2em] text-text-primary">
-                &gt; ACCESS TERMINAL <span className="inline-block h-4 w-2 animate-pulse bg-accent-green align-middle" />
-              </h1>
+            <div className="space-y-1">
+              {bootLines.slice(0, bootIndex + 1).map((line, index) => (
+                <div
+                  key={`${line}-${index}`}
+                  className="font-mono text-[9px] uppercase tracking-wider text-muted/80"
+                >
+                  {line}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -92,26 +96,26 @@ export default function Login() {
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 bg-accent-green px-4 py-3 font-mono text-sm font-bold uppercase tracking-[0.2em] text-background transition-colors hover:bg-accent-green/90"
+              className="flex w-full items-center justify-center gap-2 bg-surface text-sidebar px-4 py-3 font-mono text-sm font-bold uppercase tracking-wider transition-colors hover:bg-surface-raised"
             >
-              Login
+              Log In
               <ArrowRight size={16} />
             </button>
           </form>
 
-          <div className="mt-6 border-t border-border-hairline pt-5">
+          <div className="mt-6 border-t border-border/20 pt-5">
             <button
               type="button"
               onClick={() => navigate("/fleet")}
-              className="w-full border border-border-hairline bg-surface-raised px-4 py-3 font-mono text-xs uppercase tracking-[0.28em] text-text-primary transition-colors hover:border-accent-green hover:text-accent-green"
+              className="w-full border border-border/30 bg-transparent px-4 py-3 font-mono text-xs uppercase tracking-wider text-muted transition-colors hover:text-surface hover:border-surface"
             >
               Skip auth — Get Started →
             </button>
           </div>
 
-          <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-text-secondary">
+          <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-wider text-muted">
             Don’t have an account? {" "}
-            <Link to="/signup" className="text-accent-green underline-offset-4 hover:underline">
+            <Link to="/signup" className="text-surface underline underline-offset-4 hover:text-primary transition-colors">
               Sign Up
             </Link>
           </p>

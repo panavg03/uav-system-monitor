@@ -5,38 +5,26 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  --color-primary: #0A0B0D;
-  --color-background: #0A0B0D;
-  --color-auth: #050505;
-  --color-surface: #111318;
-  --color-surface-raised: #181B21;
-  --color-border-hairline: #242832;
+  --color-background: #F4F3EE;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #FBFBF9;
+  --color-sidebar: #18201C;
+  --color-border: #D8D7D0;
   
-  --color-text-primary: #E4E7EB;
-  --color-text-secondary: #8B92A0;
-  --color-text-muted: #4E5566;
+  --color-primary: #3F5143;
+  --color-secondary: #68705F;
+  --color-text: #18201C;
+  --color-muted: #6B6D67;
   
-  --color-accent-green: #39FF88;
-  --color-accent-green-dim: #1C7A45;
-  --color-accent-red: #FF3B3B;
-  --color-accent-red-dim: #7A1C1C;
-  --color-accent-amber: #FFB13B;
-
-  --color-scanline-overlay: rgba(57, 255, 136, 0.03);
+  --color-status-nominal: #287A50;
+  --color-status-warning: #B68127;
+  --color-status-critical: #C83C3C;
 }
 
 @layer base {
   :root {
     --background: var(--color-background);
-    --foreground: var(--color-text-primary);
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  html {
-    background: var(--color-primary);
+    --foreground: var(--color-text);
   }
 
   body {
@@ -45,9 +33,5 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image: 
-      linear-gradient(rgba(57, 255, 136, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(57, 255, 136, 0.02) 1px, transparent 1px);
-    background-size: 20px 20px;
   }
 }

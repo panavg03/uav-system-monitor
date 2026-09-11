@@ -1,24 +1,70 @@
-// lib/mockData.ts
-// Sample data standing in for live telemetry / API responses.
-// Wire these into the Fleet Dashboard, Engine Blueprint, and Param Graph components.
+// src/lib/mockData.ts
 
-export type EngineStatus = "nominal" | "advisory" | "critical"
+export type EngineStatus = "nominal" | "advisory" | "critical";
+
+export interface ModelOutput {
+  faultProbability: number;
+  faultClass: string;
+  healthRiskStatus: EngineStatus;
+}
+
+export interface EngineTelemetry {
+  cht1: number;
+  cht2: number;
+  cht3: number;
+  cht4: number;
+
+  egt1: number;
+  egt2: number;
+  egt3: number;
+  egt4: number;
+
+  oilPressure: number;
+  oilTemperature: number;
+
+  rpm: number;
+  fuelFlow: number;
+}
+
+export interface TelemetryPoint {
+  t: string;
+  value: number;
+}
+
+export type TelemetryHistory = Record<
+  keyof EngineTelemetry,
+  TelemetryPoint[]
+>;
 
 export interface Engine {
-  id: string
-  tailNumber: string
-  base: string
-  engineType: string
-  healthScore: number // 0-100
-  status: EngineStatus
-  rpm: number
-  cht: number // Cylinder Head Temp, °C
-  egt: number // Exhaust Gas Temp, °C
-  oilPressure: number // psi
-  oilTemp: number // °C
-  fuelFlow: number // L/hr
-  lastSync: string // ISO timestamp
+  id: string;
+  tailNumber: string;
+  base: string;
+  engineType: string;
+  telemetry: EngineTelemetry;
+  modelOutput: ModelOutput;
+  lastSync: string;
+
+  // Compatibility with older pages/components.
+  status: EngineStatus;
 }
+
+export interface EnginePart {
+  id: string;
+  index: number;
+  name: string;
+  status: EngineStatus;
+  healthScore: number;
+  x: number;
+  y: number;
+  subParts?: EnginePart[];
+}
+
+/*
+ * ---------------------------------------------------------
+ * SIX ACTIVE ENGINES
+ * ---------------------------------------------------------
+ */
 
 export const mockEngines: Engine[] = [
   {
@@ -26,497 +72,516 @@ export const mockEngines: Engine[] = [
     tailNumber: "UAV-104",
     base: "Base Alpha",
     engineType: "Rotax 914 (Mod)",
-    healthScore: 94,
+    lastSync: "2026-09-11T14:02:45Z",
+
+    telemetry: {
+      cht1: 172,
+      cht2: 170,
+      cht3: 174,
+      cht4: 171,
+
+      egt1: 617,
+      egt2: 620,
+      egt3: 615,
+      egt4: 617,
+
+      oilPressure: 58,
+      oilTemperature: 91,
+
+      rpm: 5243,
+      fuelFlow: 18.4,
+    },
+
+    modelOutput: {
+      faultProbability: 4.2,
+      faultClass: "NONE",
+      healthRiskStatus: "nominal",
+    },
+
     status: "nominal",
-    rpm: 5250,
-    cht: 172,
-    egt: 618,
-    oilPressure: 58,
-    oilTemp: 91,
-    fuelFlow: 18.4,
-    lastSync: "2026-09-03T14:32:00Z",
   },
+
   {
     id: "EX-107",
     tailNumber: "UAV-107",
     base: "Base Alpha",
     engineType: "Rotax 914 (Mod)",
-    healthScore: 71,
+    lastSync: "2026-09-11T14:02:38Z",
+
+    telemetry: {
+      cht1: 205,
+      cht2: 211,
+      cht3: 208,
+      cht4: 213,
+
+      egt1: 675,
+      egt2: 684,
+      egt3: 691,
+      egt4: 680,
+
+      oilPressure: 44,
+      oilTemperature: 112,
+
+      rpm: 4980,
+      fuelFlow: 20.1,
+    },
+
+    modelOutput: {
+      faultProbability: 38.7,
+      faultClass: "OIL TEMPERATURE ELEVATION",
+      healthRiskStatus: "advisory",
+    },
+
     status: "advisory",
-    rpm: 5180,
-    cht: 196,
-    egt: 662,
-    oilPressure: 49,
-    oilTemp: 104,
-    fuelFlow: 19.1,
-    lastSync: "2026-09-03T14:31:40Z",
   },
+
   {
     id: "EX-112",
     tailNumber: "UAV-112",
     base: "Base Bravo",
     engineType: "Rotax 914 (Mod)",
-    healthScore: 38,
+    lastSync: "2026-09-11T14:02:31Z",
+
+    telemetry: {
+      cht1: 231,
+      cht2: 225,
+      cht3: 235,
+      cht4: 228,
+
+      egt1: 705,
+      egt2: 710,
+      egt3: 720,
+      egt4: 700,
+
+      oilPressure: 31,
+      oilTemperature: 121,
+
+      rpm: 4870,
+      fuelFlow: 17.6,
+    },
+
+    modelOutput: {
+      faultProbability: 82.4,
+      faultClass: "EXHAUST TEMPERATURE ANOMALY",
+      healthRiskStatus: "critical",
+    },
+
     status: "critical",
-    rpm: 4870,
-    cht: 231,
-    egt: 705,
-    oilPressure: 31,
-    oilTemp: 121,
-    fuelFlow: 17.6,
-    lastSync: "2026-09-03T14:30:12Z",
   },
+
+  {
+    id: "EX-115",
+    tailNumber: "UAV-115",
+    base: "Base Bravo",
+    engineType: "Rotax 914 (Mod)",
+    lastSync: "2026-09-11T14:02:27Z",
+
+    telemetry: {
+      cht1: 181,
+      cht2: 179,
+      cht3: 184,
+      cht4: 180,
+
+      egt1: 632,
+      egt2: 638,
+      egt3: 629,
+      egt4: 635,
+
+      oilPressure: 56,
+      oilTemperature: 94,
+
+      rpm: 5310,
+      fuelFlow: 19.2,
+    },
+
+    modelOutput: {
+      faultProbability: 7.8,
+      faultClass: "NONE",
+      healthRiskStatus: "nominal",
+    },
+
+    status: "nominal",
+  },
+
   {
     id: "EX-118",
     tailNumber: "UAV-118",
-    base: "Base Bravo",
+    base: "Base Charlie",
     engineType: "Rotax 914 (Mod)",
-    healthScore: 88,
-    status: "nominal",
-    rpm: 5300,
-    cht: 168,
-    egt: 601,
-    oilPressure: 61,
-    oilTemp: 88,
-    fuelFlow: 18.2,
-    lastSync: "2026-09-03T14:32:05Z",
+    lastSync: "2026-09-11T14:02:20Z",
+
+    telemetry: {
+      cht1: 214,
+      cht2: 218,
+      cht3: 216,
+      cht4: 220,
+
+      egt1: 681,
+      egt2: 688,
+      egt3: 695,
+      egt4: 687,
+
+      oilPressure: 42,
+      oilTemperature: 108,
+
+      rpm: 5065,
+      fuelFlow: 21.3,
+    },
+
+    modelOutput: {
+      faultProbability: 46.3,
+      faultClass: "CYLINDER TEMPERATURE VARIATION",
+      healthRiskStatus: "advisory",
+    },
+
+    status: "advisory",
   },
+
   {
     id: "EX-121",
     tailNumber: "UAV-121",
     base: "Base Charlie",
     engineType: "Rotax 914 (Mod)",
-    healthScore: 64,
-    status: "advisory",
-    rpm: 5090,
-    cht: 203,
-    egt: 671,
-    oilPressure: 46,
-    oilTemp: 109,
-    fuelFlow: 19.8,
-    lastSync: "2026-09-03T14:29:55Z",
-  },
-  {
-    id: "EX-129",
-    tailNumber: "UAV-129",
-    base: "Base Charlie",
-    engineType: "Rotax 914 (Mod)",
-    healthScore: 97,
+    lastSync: "2026-09-11T14:02:14Z",
+
+    telemetry: {
+      cht1: 188,
+      cht2: 191,
+      cht3: 186,
+      cht4: 189,
+
+      egt1: 648,
+      egt2: 652,
+      egt3: 645,
+      egt4: 650,
+
+      oilPressure: 52,
+      oilTemperature: 99,
+
+      rpm: 5185,
+      fuelFlow: 18.9,
+    },
+
+    modelOutput: {
+      faultProbability: 12.6,
+      faultClass: "VIBRATION SIGNATURE",
+      healthRiskStatus: "nominal",
+    },
+
     status: "nominal",
-    rpm: 5260,
-    cht: 165,
-    egt: 595,
-    oilPressure: 60,
-    oilTemp: 86,
-    fuelFlow: 18.0,
-    lastSync: "2026-09-03T14:32:11Z",
   },
-]
+];
 
-// ---------------------------------------------------------------------
-// Engine Blueprint: major parts + sub-parts, keyed by engineId
-// ---------------------------------------------------------------------
+/*
+ * ---------------------------------------------------------
+ * TELEMETRY HISTORY
+ * ---------------------------------------------------------
+ */
 
-export interface EnginePart {
-  id: string
-  index: number // pin number shown on blueprint
-  name: string
-  healthScore: number
-  status: EngineStatus
-  x: number // % position on blueprint SVG, 0-100
-  y: number
-  subParts?: EnginePart[]
+const makeSeries = (
+  values: number[],
+  startHour = 8,
+): TelemetryPoint[] => {
+  return values.map((value, index) => ({
+    t: `${String(startHour + Math.floor(index / 2)).padStart(2, "0")}:${
+      index % 2 === 0 ? "00" : "30"
+    }`,
+    value,
+  }));
+};
+
+const buildHistory = (
+  telemetry: EngineTelemetry,
+  profile: "nominal" | "advisory" | "critical",
+): TelemetryHistory => {
+  const drift =
+    profile === "critical"
+      ? 1.8
+      : profile === "advisory"
+        ? 0.8
+        : 0.25;
+
+  const vary = (base: number, amount: number) => [
+    base - amount * 1.2,
+    base - amount,
+    base - amount * 0.5,
+    base,
+    base + amount * 0.4,
+    base + amount * drift,
+    base + amount * 0.8,
+    base + amount * drift * 1.2,
+  ];
+
+  return {
+    cht1: makeSeries(vary(telemetry.cht1, 7)),
+    cht2: makeSeries(vary(telemetry.cht2, 6)),
+    cht3: makeSeries(vary(telemetry.cht3, 7)),
+    cht4: makeSeries(vary(telemetry.cht4, 6)),
+
+    egt1: makeSeries(vary(telemetry.egt1, 12)),
+    egt2: makeSeries(vary(telemetry.egt2, 11)),
+    egt3: makeSeries(vary(telemetry.egt3, 13)),
+    egt4: makeSeries(vary(telemetry.egt4, 10)),
+
+    oilPressure: makeSeries(vary(telemetry.oilPressure, 3)),
+    oilTemperature: makeSeries(
+      vary(telemetry.oilTemperature, 4),
+    ),
+
+    rpm: makeSeries(vary(telemetry.rpm, 120)),
+    fuelFlow: makeSeries(vary(telemetry.fuelFlow, 1.1)),
+  };
+};
+
+export const telemetryByEngineId: Record<
+  string,
+  TelemetryHistory
+> = Object.fromEntries(
+  mockEngines.map((engine) => [
+    engine.id,
+    buildHistory(
+      engine.telemetry,
+      engine.modelOutput.healthRiskStatus,
+    ),
+  ]),
+) as Record<string, TelemetryHistory>;
+
+/*
+ * ---------------------------------------------------------
+ * MODEL HISTORY
+ * ---------------------------------------------------------
+ */
+
+export interface ModelHistoryPoint {
+  t: string;
+  faultProbability: number;
+  faultClass: string;
+  healthRiskStatus: EngineStatus;
 }
 
-const cylinderHeadSubParts: EnginePart[] = [
+export const modelHistoryByEngineId: Record<
+  string,
+  ModelHistoryPoint[]
+> = Object.fromEntries(
+  mockEngines.map((engine) => {
+    const current = engine.modelOutput.faultProbability;
+
+    const probabilities = [
+      Math.max(2, current * 0.12),
+      Math.max(3, current * 0.25),
+      Math.max(4, current * 0.42),
+      Math.max(5, current * 0.61),
+      Math.max(6, current * 0.78),
+      current,
+    ];
+
+    return [
+      engine.id,
+      probabilities.map((probability, index) => {
+        const status: EngineStatus =
+          probability >= 70
+            ? "critical"
+            : probability >= 30
+              ? "advisory"
+              : "nominal";
+
+        return {
+          t: `${String(9 + index).padStart(2, "0")}:${
+            index % 2 === 0 ? "00" : "30"
+          }`,
+          faultProbability: Number(probability.toFixed(1)),
+          faultClass:
+            status === "nominal"
+              ? "NONE"
+              : status === "advisory"
+                ? "EARLY ANOMALY"
+                : engine.modelOutput.faultClass,
+          healthRiskStatus: status,
+        };
+      }),
+    ];
+  }),
+);
+
+/*
+ * ---------------------------------------------------------
+ * LEGACY PART COMPATIBILITY
+ *
+ * These exports are retained so older routes/components
+ * do not break. They are NOT used as the telemetry model.
+ * ---------------------------------------------------------
+ */
+
+const compatibilityParts = [
   {
-    id: "valve-assembly",
+    id: "cylinder-head",
     index: 1,
-    name: "Valve Assembly",
-    healthScore: 82,
-    status: "nominal",
-    x: 0,
-    y: 0,
+    name: "Cylinder Head",
+    status: "nominal" as EngineStatus,
+    healthScore: 94,
+    x: 34,
+    y: 22,
   },
   {
-    id: "spark-plug",
+    id: "exhaust-path",
     index: 2,
-    name: "Spark Plug",
-    healthScore: 55,
-    status: "advisory",
-    x: 0,
-    y: 0,
+    name: "Exhaust Gas Path",
+    status: "nominal" as EngineStatus,
+    healthScore: 92,
+    x: 66,
+    y: 28,
   },
   {
-    id: "head-gasket",
+    id: "oil-system",
     index: 3,
-    name: "Head Gasket",
-    healthScore: 90,
-    status: "nominal",
-    x: 0,
-    y: 0,
+    name: "Oil System",
+    status: "nominal" as EngineStatus,
+    healthScore: 91,
+    x: 28,
+    y: 62,
   },
   {
-    id: "coolant-jacket",
+    id: "fuel-injection",
     index: 4,
-    name: "Coolant Jacket",
-    healthScore: 76,
-    status: "advisory",
-    x: 0,
-    y: 0,
+    name: "Fuel Injection",
+    status: "nominal" as EngineStatus,
+    healthScore: 93,
+    x: 70,
+    y: 62,
   },
-]
+];
 
-const fuelInjectionSubParts: EnginePart[] = [
-  {
-    id: "injector-1",
-    index: 1,
-    name: "Injector — Cyl 1",
-    healthScore: 88,
-    status: "nominal",
-    x: 0,
-    y: 0,
-  },
-  {
-    id: "injector-2",
-    index: 2,
-    name: "Injector — Cyl 2",
-    healthScore: 41,
-    status: "critical",
-    x: 0,
-    y: 0,
-  },
-  {
-    id: "fuel-pump",
-    index: 3,
-    name: "Fuel Pump",
-    healthScore: 79,
-    status: "advisory",
-    x: 0,
-    y: 0,
-  },
-]
+export const enginePartsByEngineId: Record<
+  string,
+  EnginePart[]
+> = Object.fromEntries(
+  mockEngines.map((engine) => {
+    const engineStatus = engine.modelOutput.healthRiskStatus;
 
-export const enginePartsByEngineId: Record<string, EnginePart[]> = {
-  "EX-104": [
-    {
-      id: "cylinder-head",
-      index: 1,
-      name: "Cylinder Head",
-      healthScore: 87,
-      status: "nominal",
-      x: 32,
-      y: 18,
-      subParts: cylinderHeadSubParts,
-    },
-    {
-      id: "exhaust-path",
-      index: 2,
-      name: "Exhaust Gas Path",
-      healthScore: 91,
-      status: "nominal",
-      x: 68,
-      y: 22,
-    },
-    {
-      id: "oil-system",
-      index: 3,
-      name: "Oil System",
-      healthScore: 93,
-      status: "nominal",
-      x: 25,
-      y: 55,
-    },
-    {
-      id: "fuel-injection",
-      index: 4,
-      name: "Fuel Injection System",
-      healthScore: 89,
-      status: "nominal",
-      x: 55,
-      y: 60,
-      subParts: fuelInjectionSubParts,
-    },
-    {
-      id: "cooling-system",
-      index: 5,
-      name: "Cooling System",
-      healthScore: 95,
-      status: "nominal",
-      x: 78,
-      y: 50,
-    },
-    {
-      id: "vibration-bearing",
-      index: 6,
-      name: "Vibration / Bearing Assembly",
-      healthScore: 90,
-      status: "nominal",
-      x: 45,
-      y: 80,
-    },
-    {
-      id: "battery-alternator",
-      index: 7,
-      name: "Battery / Alternator",
-      healthScore: 84,
-      status: "nominal",
-      x: 15,
-      y: 30,
-    },
-    {
-      id: "ignition-timing",
-      index: 8,
-      name: "Ignition / Timing System",
-      healthScore: 92,
-      status: "nominal",
-      x: 60,
-      y: 35,
-    },
-  ],
-  "EX-112": [
-    {
-      id: "cylinder-head",
-      index: 1,
-      name: "Cylinder Head",
-      healthScore: 33,
-      status: "critical",
-      x: 32,
-      y: 18,
-      subParts: cylinderHeadSubParts,
-    },
-    {
-      id: "exhaust-path",
-      index: 2,
-      name: "Exhaust Gas Path",
-      healthScore: 40,
-      status: "critical",
-      x: 68,
-      y: 22,
-    },
-    {
-      id: "oil-system",
-      index: 3,
-      name: "Oil System",
-      healthScore: 52,
-      status: "advisory",
-      x: 25,
-      y: 55,
-    },
-    {
-      id: "fuel-injection",
-      index: 4,
-      name: "Fuel Injection System",
-      healthScore: 45,
-      status: "critical",
-      x: 55,
-      y: 60,
-      subParts: fuelInjectionSubParts,
-    },
-    {
-      id: "cooling-system",
-      index: 5,
-      name: "Cooling System",
-      healthScore: 61,
-      status: "advisory",
-      x: 78,
-      y: 50,
-    },
-    {
-      id: "vibration-bearing",
-      index: 6,
-      name: "Vibration / Bearing Assembly",
-      healthScore: 58,
-      status: "advisory",
-      x: 45,
-      y: 80,
-    },
-    {
-      id: "battery-alternator",
-      index: 7,
-      name: "Battery / Alternator",
-      healthScore: 70,
-      status: "advisory",
-      x: 15,
-      y: 30,
-    },
-    {
-      id: "ignition-timing",
-      index: 8,
-      name: "Ignition / Timing System",
-      healthScore: 49,
-      status: "critical",
-      x: 60,
-      y: 35,
-    },
-  ],
+    return [
+      engine.id,
+      compatibilityParts.map((part) => ({
+        ...part,
+        status:
+          engineStatus === "critical" && part.index !== 3
+            ? "critical"
+            : engineStatus === "advisory" &&
+                part.index === 3
+              ? "advisory"
+              : part.status,
+        healthScore:
+          engineStatus === "critical"
+            ? Math.max(35, part.healthScore - 45)
+            : engineStatus === "advisory"
+              ? Math.max(55, part.healthScore - 25)
+              : part.healthScore,
+      })),
+    ];
+  }),
+);
+
+/*
+ * ---------------------------------------------------------
+ * ALERTS
+ * ---------------------------------------------------------
+ */
+
+export interface MockAlert {
+  id: string;
+  engineId: string;
+  severity: "critical" | "advisory";
+  message: string;
+  timestamp: string;
+  partId?: string;
 }
 
-// ---------------------------------------------------------------------
-// Time-series telemetry for ParamGraph components (last 24 points ~ hourly)
-// ---------------------------------------------------------------------
-
-export interface TelemetryPoint {
-  t: string // ISO timestamp
-  value: number
-}
-
-function genSeries(
-  base: number,
-  jitter: number,
-  points = 24,
-  drift = 0,
-): TelemetryPoint[] {
-  const now = new Date("2026-09-03T14:30:00Z").getTime()
-  return Array.from({ length: points }, (_, i) => {
-    const t = new Date(now - (points - 1 - i) * 60 * 60 * 1000).toISOString()
-    const value =
-      Math.round(
-        (base + drift * (i / points) + (Math.random() - 0.5) * jitter) * 10,
-      ) / 10
-    return { t, value }
-  })
-}
-
-export const telemetryByEngineId: Record<string, Record<string, TelemetryPoint[]>> =
+export const mockAlerts: MockAlert[] = [
   {
-    "EX-104": {
-      rpm: genSeries(5250, 60),
-      cht: genSeries(172, 4),
-      egt: genSeries(618, 10),
-      oilPressure: genSeries(58, 2),
-      oilTemp: genSeries(91, 3),
-      fuelFlow: genSeries(18.4, 0.6),
-    },
-    "EX-112": {
-      rpm: genSeries(4950, 90, 24, -140),
-      cht: genSeries(205, 6, 24, 26),
-      egt: genSeries(660, 15, 24, 45),
-      oilPressure: genSeries(45, 4, 24, -14),
-      oilTemp: genSeries(102, 5, 24, 19),
-      fuelFlow: genSeries(18.0, 0.8, 24, -0.8),
-    },
-  }
-
-// ---------------------------------------------------------------------
-// Alerts / notifications for right rail
-// ---------------------------------------------------------------------
-
-export interface Alert {
-  id: string
-  engineId: string
-  partId?: string
-  severity: "critical" | "advisory"
-  message: string
-  timestamp: string
-}
-
-export const mockAlerts: Alert[] = [
-  {
-    id: "a1",
+    id: "ALT-001",
     engineId: "EX-112",
-    partId: "cylinder-head",
     severity: "critical",
-    message: "EGT drift detected — Cyl 3",
-    timestamp: "2026-09-03T14:25:00Z",
+    message:
+      "Exhaust temperature anomaly detected. Model fault probability exceeds critical threshold.",
+    timestamp: "2026-09-11T13:36:00Z",
   },
   {
-    id: "a2",
+    id: "ALT-002",
     engineId: "EX-112",
-    partId: "fuel-injection",
     severity: "critical",
-    message: "Injector abnormality — Cyl 2",
-    timestamp: "2026-09-03T14:10:00Z",
+    message:
+      "Oil pressure below nominal operating range.",
+    timestamp: "2026-09-11T13:45:00Z",
   },
   {
-    id: "a3",
+    id: "ALT-003",
     engineId: "EX-107",
-    partId: undefined,
     severity: "advisory",
-    message: "Oil temperature trending high",
-    timestamp: "2026-09-03T13:55:00Z",
+    message:
+      "Oil temperature trending above nominal operating range.",
+    timestamp: "2026-09-11T13:47:00Z",
   },
   {
-    id: "a4",
-    engineId: "EX-121",
-    partId: undefined,
+    id: "ALT-004",
+    engineId: "EX-118",
     severity: "advisory",
-    message: "Vibration signature outside nominal band",
-    timestamp: "2026-09-03T13:40:00Z",
+    message:
+      "Cylinder head temperature variation detected across the four cylinders.",
+    timestamp: "2026-09-11T13:52:00Z",
   },
-]
+];
+
+/*
+ * ---------------------------------------------------------
+ * REPORTS
+ * ---------------------------------------------------------
+ */
+
+export interface MockReport {
+  id: string;
+  engineId: string;
+  date: string;
+  title: string;
+  faultProbability: number;
+  faultClass: string;
+  healthRiskStatus: EngineStatus;
+  summary: string;
+}
+
+export const mockReports: MockReport[] = mockEngines.map(
+  (engine, index) => ({
+    id: `RPT-${String(index + 1).padStart(3, "0")}`,
+    engineId: engine.id,
+    date: "2026-09-11",
+    title: `${engine.id} Engine Diagnostic Report`,
+    faultProbability:
+      engine.modelOutput.faultProbability,
+    faultClass: engine.modelOutput.faultClass,
+    healthRiskStatus:
+      engine.modelOutput.healthRiskStatus,
+    summary:
+      engine.modelOutput.healthRiskStatus === "critical"
+        ? "Critical anomaly detected. Immediate inspection recommended."
+        : engine.modelOutput.healthRiskStatus === "advisory"
+          ? "Anomaly indicators detected. Continue monitoring and schedule maintenance."
+          : "Engine telemetry remains within nominal operating envelope.",
+  }),
+);
 
 export const mockMaintenanceAdvisories = [
   {
-    id: "m1",
+    id: "MA-001",
     engineId: "EX-112",
-    part: "Injector — Cyl 2",
-    recommendation: "Replace within 5 flight hours",
+    title: "Oil / Fuel System Inspection",
+    description: "Inspect fuel injection and oil system before next flight cycle.",
+    due: "Within 5 flight hours",
+    severity: "critical" as EngineStatus,
   },
   {
-    id: "m2",
+    id: "MA-002",
     engineId: "EX-107",
-    part: "Spark Plug (Cyl Head)",
-    recommendation: "Inspect at next scheduled maintenance",
+    title: "Engine Temperature Inspection",
+    description: "Inspect engine cooling and temperature sensors at next scheduled maintenance.",
+    due: "Next scheduled maintenance",
+    severity: "advisory" as EngineStatus,
   },
-]
-
-export interface MissionReport {
-  id: string
-  engineId: string
-  date: string
-  durationMinutes: number
-  healthDelta: number
-  summary: string
-}
-
-export const mockReports: MissionReport[] = [
-  {
-    id: "MSN-2041",
-    engineId: "EX-104",
-    date: "2026-09-02T13:40:00Z",
-    durationMinutes: 208,
-    healthDelta: 2.4,
-    summary: "Stable operation with minor EGT drift during final climb phase.",
-  },
-  {
-    id: "MSN-2077",
-    engineId: "EX-107",
-    date: "2026-09-01T10:20:00Z",
-    durationMinutes: 176,
-    healthDelta: -3.8,
-    summary: "Oil temperature rose above nominal during low-altitude corridor run.",
-  },
-  {
-    id: "MSN-2112",
-    engineId: "EX-112",
-    date: "2026-08-31T18:15:00Z",
-    durationMinutes: 142,
-    healthDelta: -9.1,
-    summary: "Critical injector issue detected after sustained high-load maneuvering.",
-  },
-  {
-    id: "MSN-2145",
-    engineId: "EX-118",
-    date: "2026-08-30T07:05:00Z",
-    durationMinutes: 195,
-    healthDelta: 1.9,
-    summary: "Sensor sweep completed, no intervention required across main subsystems.",
-  },
-  {
-    id: "MSN-2182",
-    engineId: "EX-121",
-    date: "2026-08-29T05:55:00Z",
-    durationMinutes: 164,
-    healthDelta: -4.2,
-    summary: "Vibration profile exceeded advisory threshold in the final 40 minutes.",
-  },
-  {
-    id: "MSN-2206",
-    engineId: "EX-129",
-    date: "2026-08-28T12:00:00Z",
-    durationMinutes: 221,
-    healthDelta: 3.5,
-    summary: "Airframe and engine telemetry remained within healthy operational band.",
-  },
-]
+];

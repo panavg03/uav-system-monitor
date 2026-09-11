@@ -1,186 +1,126 @@
 import React from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { 
-  Activity, 
-  Settings, 
-  Bell, 
-  ShieldAlert, 
-  Plane, 
-  Search,
-  ChevronDown,
-  Menu,
-  Plus
-} from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Bell, FileText, Gauge, Plus, Settings } from "lucide-react";
 import { cn } from "../lib/utils";
-import { mockEngines, mockAlerts, mockMaintenanceAdvisories } from "../lib/mockData";
+import { mockAlerts, mockEngines } from "../lib/mockData";
+import { getFaultProbabilityStatus, useAlertThresholds } from "../lib/alertThresholds";
 
-const Navigation = () => {
-  const items = [
-    { label: "FLEET", path: "/fleet", icon: Plane },
-    { label: "REPORTS", path: "/reports", icon: Activity },
-    { label: "ALERTS", path: "/alerts", icon: Bell },
-    { label: "SETTINGS", path: "/settings", icon: Settings },
-  ];
+const navItems = [
+  { label: "Fleet", path: "/fleet", icon: Gauge },
+  { label: "Reports", path: "/reports", icon: FileText },
+  { label: "Alerts", path: "/alerts", icon: Bell },
+  { label: "Settings", path: "/settings", icon: Settings },
+];
 
-  return (
-    <nav className="flex flex-col gap-2 mt-6">
-      {items.map((item) => {
-        const Icon = item.icon;
-        return (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-3 px-4 py-2 text-sm tracking-widest font-mono uppercase border border-transparent transition-colors",
-                isActive 
-                  ? "text-accent-green bg-accent-green/10 border-accent-green/20" 
-                  : "text-text-secondary hover:text-text-primary hover:bg-surface-raised"
-              )
-            }
-          >
-            <Icon size={16} />
-            {item.label}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
+const relativeTime = (timestamp: string) => {
+  const diff = Math.round((Date.now() - new Date(timestamp).getTime()) / 60000);
+  if (diff <= 0) return "LIVE";
+  if (diff < 60) return `-${diff}m`;
+  return `-${Math.floor(diff / 60)}h`;
 };
 
-export const Layout = () => {
-  const nominalCount = mockEngines.filter(e => e.status === 'nominal').length;
-  const advisoryCount = mockEngines.filter(e => e.status === 'advisory').length;
-  const criticalCount = mockEngines.filter(e => e.status === 'critical').length;
-  const totalCount = mockEngines.length;
+export function Layout() {
+  const navigate = useNavigate();
+  const thresholds = useAlertThresholds();
+  const activeAlerts = mockAlerts
+    .map((alert) => {
+      const engine = mockEngines.find((item) => item.id === alert.engineId);
+      const severity = engine
+        ? getFaultProbabilityStatus(engine.modelOutput.faultProbability, thresholds)
+        : alert.severity;
+      return { ...alert, severity };
+    })
+    .filter((alert) => alert.severity !== "nominal");
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
-      {/* Top Bar */}
-      <header className="h-14 border-b border-border-hairline bg-surface flex items-center justify-between px-6 shrink-0 relative">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-accent-red/80 z-10"></div>
-        <div className="flex items-center gap-4">
-          <div className="font-mono font-bold text-accent-green tracking-widest text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-accent-green/20 border border-accent-green flex items-center justify-center">
-               <div className="w-1.5 h-1.5 bg-accent-green"></div>
-            </div>
-            UAV_DT_SYS
-          </div>
-          <div className="h-4 w-px bg-border-hairline"></div>
-          <div className="text-xs font-mono text-accent-red tracking-widest bg-accent-red/10 px-2 py-0.5 border border-accent-red/30">
-            FLEET OPS // RESTRICTED ACCESS
-          </div>
+    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-background text-text-primary">
+      <header className="flex h-16 shrink-0 items-center border-b border-border-hairline bg-surface px-5 sm:px-7">
+        <div className="flex items-center gap-3">
+          <div className="font-mono text-base font-bold tracking-[0.18em] text-text-primary">UAV_DT_SYS</div>
+          <div className="hidden h-5 w-px bg-border-hairline sm:block" />
+          <div className="hidden font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted sm:block">Defence Technology Division</div>
         </div>
-        
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-text-secondary text-sm font-mono">
-            <span>SQDN-7</span>
-            <ChevronDown size={14} />
-          </div>
-          <div className="w-8 h-8 rounded bg-surface-raised border border-border-hairline flex items-center justify-center text-text-primary">
-            <Menu size={16} />
-          </div>
+        <div className="ml-6 border border-accent-red/30 bg-accent-red/5 px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-accent-red">
+          Classified // Authorized Personnel Only
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        
-        {/* Left Rail */}
-        <aside className="w-64 border-r border-border-hairline bg-surface flex flex-col shrink-0">
-          <div className="p-4 border-b border-border-hairline">
-            <button className="w-full flex items-center justify-center gap-2 bg-accent-green/10 text-accent-green border border-accent-green/50 py-2 hover:bg-accent-green hover:text-background transition-all font-mono text-sm font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(57,255,136,0.1)]">
-              <Plus size={16} />
-              Add Engine
-            </button>
-          </div>
-          
-          <div className="p-6 border-b border-border-hairline flex flex-col gap-4">
-            <div className="text-xs font-mono text-text-secondary tracking-widest uppercase mb-2">Fleet Status</div>
-            
-            <div className="flex gap-4 items-end">
-              <div className="relative w-16 h-16 rounded-full border-4 border-surface-raised flex items-center justify-center">
-                <svg className="absolute inset-0 w-full h-full -rotate-90">
-                  <circle cx="32" cy="32" r="28" fill="none" className="stroke-surface-raised" strokeWidth="4" />
-                  <circle cx="32" cy="32" r="28" fill="none" className="stroke-accent-green" strokeWidth="4" strokeDasharray="175" strokeDashoffset={175 * (1 - nominalCount / totalCount)} />
-                  <circle cx="32" cy="32" r="28" fill="none" className="stroke-accent-amber" strokeWidth="4" strokeDasharray="175" strokeDashoffset={175 * (1 - (nominalCount + advisoryCount) / totalCount)} />
-                </svg>
-                <div className="text-sm font-mono text-text-primary font-bold">{totalCount}</div>
-              </div>
-              <div className="flex flex-col gap-1.5 font-mono text-xs">
-                <div className="flex items-center gap-2 text-accent-green">
-                  <div className="w-2 h-2 bg-accent-green shadow-[0_0_5px_rgba(57,255,136,0.5)]"></div> {nominalCount} Nominal
-                </div>
-                <div className="flex items-center gap-2 text-accent-amber">
-                  <div className="w-2 h-2 bg-accent-amber shadow-[0_0_5px_rgba(255,177,59,0.5)]"></div> {advisoryCount} Advisory
-                </div>
-                <div className="flex items-center gap-2 text-accent-red">
-                  <div className="w-2 h-2 bg-accent-red shadow-[0_0_5px_rgba(255,59,59,0.5)]"></div> {criticalCount} Critical
-                </div>
-              </div>
-            </div>
+      <div className="flex min-h-0 flex-1">
+        <aside className="hidden w-60 shrink-0 flex-col border-r border-[#26332c] bg-[#142019] md:flex">
+          <div className="p-5">
+            <div className="font-mono text-sm font-bold tracking-[0.18em] text-[#f0f4f1]">UAV_DT_SYS</div>
+            <div className="mt-1 font-mono text-[8px] uppercase tracking-[0.18em] text-[#728078]">Defence Technology Division</div>
           </div>
 
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-2">
-            <Navigation />
-          </div>
-          
-          <div className="p-4 border-t border-border-hairline flex items-center gap-3">
-             <div className="w-2 h-2 rounded-full bg-accent-green animate-pulse"></div>
-             <span className="text-xs font-mono text-text-secondary">SYSTEM ONLINE</span>
+          <button
+            type="button"
+            onClick={() => navigate("/fleet")}
+            className="mx-4 flex items-center justify-center gap-2 border border-[#456050] bg-[#314b3b] px-3 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#d8e6dc] hover:bg-[#3b5946]"
+          >
+            <Plus size={14} /> Add Engine
+          </button>
+
+          <nav className="mt-6 flex-1 space-y-1 px-3">
+            {navItems.map(({ label, path, icon: Icon }) => (
+              <NavLink
+                key={label}
+                to={path}
+                className={({ isActive }) => cn(
+                  "flex items-center gap-3 border-l-2 px-3 py-2.5 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors",
+                  isActive
+                    ? "border-[#59d38b] bg-[#243d30] text-[#7ee6a5]"
+                    : "border-transparent text-[#839188] hover:bg-[#1d2c24] hover:text-[#edf3ee]",
+                )}
+              >
+                <Icon size={15} />
+                <span>{label}</span>
+                {label === "Alerts" && <span className="ml-auto bg-accent-red px-1.5 py-0.5 text-[8px] font-bold text-white">{activeAlerts.length}</span>}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="border-t border-[#26332c] p-5">
+            <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#72df9a]">
+              <span className="h-2 w-2 rounded-full bg-[#59d38b]" /> System Online
+            </div>
+            <div className="mt-3 font-mono text-[8px] uppercase tracking-[0.15em] text-[#65736b]">VERSION 4.2.0-STABLE</div>
+            <div className="mt-1 font-mono text-[8px] uppercase tracking-[0.15em] text-[#65736b]">SECURE LINK: ACTIVE</div>
           </div>
         </aside>
 
-        {/* Center Content */}
-        <main className="flex-1 flex flex-col relative min-w-0">
+        <main className="min-w-0 flex-1 min-h-0 overflow-hidden">
           <Outlet />
         </main>
 
-        {/* Right Rail */}
-        <aside className="w-80 border-l border-border-hairline bg-surface flex flex-col shrink-0">
-          <div className="p-4 border-b border-border-hairline flex items-center justify-between">
-             <div className="text-xs font-mono text-text-secondary tracking-widest uppercase">Active Alerts</div>
-             <div className="bg-accent-red/20 text-accent-red px-1.5 py-0.5 text-[10px] font-mono border border-accent-red/50">{mockAlerts.length}</div>
+        <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border-hairline bg-surface/70 xl:block">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border-hairline bg-surface px-4 py-4">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-primary">Active Alerts</div>
+            <span className="bg-accent-red px-2 py-1 font-mono text-[10px] font-bold text-white">{activeAlerts.length}</span>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-             {mockAlerts.map(alert => {
-               const relMin = Math.round((Date.now() - new Date(alert.timestamp).getTime()) / 60000);
-               const relTime = relMin < 60 ? `${relMin}m ago` : `${Math.floor(relMin / 60)}h ${relMin % 60}m ago`;
-               return (
-                 <div key={alert.id} className="p-3 border border-border-hairline bg-surface-raised cursor-pointer hover:border-text-muted transition-colors group relative">
-                   <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-text-muted opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                   <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-text-muted opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                   <div className="flex items-start gap-3">
-                      <ShieldAlert size={16} className={cn("mt-0.5 shrink-0", alert.severity === 'critical' ? 'text-accent-red drop-shadow-[0_0_4px_rgba(255,59,59,0.5)]' : 'text-accent-amber')} />
-                      <div className="flex flex-col gap-1 flex-1">
-                         <div className="flex justify-between items-center text-xs font-mono">
-                            <span className="text-text-primary font-bold">{alert.engineId}</span>
-                            <span className="text-text-muted">{relTime}</span>
-                         </div>
-                         <div className="text-sm font-sans text-text-secondary">{alert.message}</div>
-                         {alert.partId && (
-                           <div className="text-[10px] font-mono text-accent-amber mt-1 uppercase tracking-wider">{alert.partId}</div>
-                         )}
-                      </div>
-                   </div>
-                 </div>
-               );
-             })}
-
-             <div className="mt-4 pt-4 border-t border-border-hairline">
-                <div className="text-[10px] font-mono text-text-muted tracking-widest uppercase mb-3">Maintenance Advisory</div>
-                <div className="flex flex-col gap-2">
-                   {mockMaintenanceAdvisories.map(adv => (
-                     <div key={adv.id} className="text-xs font-sans text-text-secondary flex flex-col gap-0.5">
-                       <span className="font-mono text-text-primary">{adv.engineId} — {adv.part}</span>
-                       <span className="text-text-muted">{adv.recommendation}</span>
-                     </div>
-                   ))}
+          <div className="space-y-3 p-4">
+            {activeAlerts.map((alert) => (
+              <button
+                key={alert.id}
+                type="button"
+                onClick={() => navigate(`/engine/${alert.engineId}`)}
+                className="w-full border border-border-hairline bg-surface p-3 text-left transition-colors hover:border-accent-green/60 hover:bg-surface-raised"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-text-primary">{alert.engineId}</span>
+                  <span className="font-mono text-[8px] text-text-muted">{relativeTime(alert.timestamp)} ago</span>
                 </div>
-             </div>
+                <div className={cn("mt-2 font-mono text-[8px] uppercase tracking-[0.16em]", alert.severity === "critical" ? "text-accent-red" : "text-accent-amber")}>
+                  {alert.severity}
+                </div>
+                <p className="mt-2 text-xs leading-5 text-text-secondary">{alert.message}</p>
+              </button>
+            ))}
+
+
           </div>
         </aside>
       </div>
     </div>
   );
-};
+}
